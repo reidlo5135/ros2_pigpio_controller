@@ -43,11 +43,11 @@ void move_right() {
 void stop() {
     std::cout << "stop" << '\n';
 
-    pwmWrite(MOTOR_A1_PIN, 0);
-    pwmWrite(MOTOR_B1_PIN, 0);
+    pwmWrite(MOTOR_A1_PIN, PWM_STOP);
+    pwmWrite(MOTOR_B1_PIN, PWM_STOP);
 }
 
-int main() {
+int main(void) {
     wiringPiSetup();
 
     pinMode(MOTOR_A1_PIN, PWM_OUTPUT);
@@ -56,8 +56,8 @@ int main() {
     pinMode(MOTOR_B2_PIN, OUTPUT);
 
     pwmSetMode(PWM_MODE_MS);
-    pwmSetRange(100);
-    pwmSetClock(384);
+    pwmSetRange(PWM_RANGE);
+    pwmSetClock(PWM_CLOCK);
 
     try {
         move_forward();
