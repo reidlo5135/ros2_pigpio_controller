@@ -25,7 +25,7 @@ find_library(WIRINGPI_LIB wiringPi)
 
 add_executable(
   boot_zumo
-  src/main.cpp
+  src/boot_zumo.cpp
 )
 
 ament_target_dependencies(
