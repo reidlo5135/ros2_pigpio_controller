@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.5)
-project(motor_run)
+project(zumo_motor_run)
 
 if(NOT CMAKE_C_STANDARD)
   set(CMAKE_C_STANDARD 99)
@@ -21,25 +21,27 @@ include_directories(
 
 find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
+find_package(geometry_msgs REQUIRED)
 find_library(WIRINGPI_LIB wiringPi)
 
 add_executable(
-  motor_boot
-  src/motor_boot.cpp
+  control_zumo
+  src/control_zumo.cpp
 )
 
 ament_target_dependencies(
-  motor_boot
+  control_zumo
   rclcpp
+  geometry_msgs
 )
 
 target_link_libraries(
-  motor_boot
+  control_zumo
   ${WIRINGPI_LIB}
 )
 
 install(TARGETS
-  motor_boot
+  control_zumo
   DESTINATION lib/${PROJECT_NAME}
 )
 

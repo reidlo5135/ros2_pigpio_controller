@@ -1,4 +1,21 @@
-#include "motor_boot.hpp"
+#include "control_zumo.hpp"
+
+RCLZumoMotorRunner::RCLZumoMotorRunner()
+: Node(RCL_NODE_NAME) {
+	ros_node_ptr_ = std::shared_ptr<rclcpp::Node>(this, [](rclcpp::Node*){});
+	ros_cmd_vel_subscription_ptr_ = ros_node_ptr_->create_subscription<geometry_msgs::msg::Twist>(
+		RCL_CMD_VEL_TOPIC,
+		rclcpp::QoS(rclcpp::KeepLast(RCL_DEFAULT_QOS)),
+		[this](const geometry_msgs::msg::Twist::SharedPtr callback_twist_ptr) {
+			RCLCPP_INFO(ros_node_ptr_->get_logger(), "callback twist linear x : %f", callback_twist_ptr->linear.x);
+		}
+	);
+	RCLCPP_INFO(ros_node_ptr_->get_logger(), "RCLZumoMotorRunner has started...");
+}
+
+RCLZumoMotorRunner::~RCLZumoMotorRunner() {
+
+}
 
 void move_forward() {
     std::cout << "forward" << '\n';
@@ -47,7 +64,7 @@ void stop() {
     pwmWrite(MOTOR_B1_PIN, PWM_STOP);
 }
 
-int main(void) {
+int main(int argc, char** argv) {
     wiringPiSetup();
 
     pinMode(MOTOR_A1_PIN, PWM_OUTPUT);
@@ -76,6 +93,11 @@ int main(void) {
     } catch (...) {
         std::cout << "Exception occurred" << '\n';
     }
+
+    rclcpp::init(argc, argv);
+    std::shared_ptr<rclcpp::Node> node = std::make_shared<RCLZumoMotorRunner>();
+    rclcpp::spin(node);
+    rclcpp::shutdown();
 
     stop();
     pinMode(MOTOR_A1_PIN, INPUT);
