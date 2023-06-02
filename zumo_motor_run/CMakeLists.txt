@@ -16,32 +16,19 @@ endif()
 include_directories(
   include
   include/${PROJECT_NAME}
-  /usr/include/wiringPi
 )
 
 find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
+find_package(std_msgs REQUIRED)
 find_package(geometry_msgs REQUIRED)
-find_library(WIRINGPI_LIB wiringPi)
 
-add_executable(
-  control_zumo
-  src/control_zumo.cpp
-)
-
-ament_target_dependencies(
-  control_zumo
-  rclcpp
-  geometry_msgs
-)
-
-target_link_libraries(
-  control_zumo
-  ${WIRINGPI_LIB}
-)
+add_executable(gpio_pwm_writer src/gpio_pwm_writer.cpp)
+target_link_libraries(gpio_pwm_writer pigpiod_if2)
+ament_target_dependencies(gpio_pwm_writer rclcpp std_msgs)
 
 install(TARGETS
-  control_zumo
+  gpio_pwm_writer
   DESTINATION lib/${PROJECT_NAME}
 )
 
