@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.5)
-project(zumo_run)
+project(motor_run)
 
 if(NOT CMAKE_C_STANDARD)
   set(CMAKE_C_STANDARD 99)
@@ -24,22 +24,22 @@ find_package(rclcpp REQUIRED)
 find_library(WIRINGPI_LIB wiringPi)
 
 add_executable(
-  boot_zumo
-  src/boot_zumo.cpp
+  motor_boot
+  src/motor_boot.cpp
 )
 
 ament_target_dependencies(
-  boot_zumo
+  motor_boot
   rclcpp
 )
 
 target_link_libraries(
-  boot_zumo
+  motor_boot
   ${WIRINGPI_LIB}
 )
 
 install(TARGETS
-  boot_zumo
+  motor_boot
   DESTINATION lib/${PROJECT_NAME}
 )
 

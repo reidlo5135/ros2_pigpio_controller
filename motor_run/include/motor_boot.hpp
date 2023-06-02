@@ -1,5 +1,5 @@
-#ifndef BOOT_ZUMO
-#define BOOT_ZUMO
+#ifndef MOTOR_BOOT
+#define MOTOR_BOOT
 
 #include <iostream>
 #include <chrono>
