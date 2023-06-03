@@ -3,6 +3,7 @@
 PWMWriter::PWMWriter()
 : Node(ROS_NODE_NAME) {
 	ros_node_ptr_ = std::shared_ptr<rclcpp::Node>(this, [](rclcpp::Node*){});
+
 	ros_node_ptr_->declare_parameter<int>("motor_left_pin", 18);
 	ros_node_ptr_->get_parameter("motor_left_pin", motor_left_pin_);
        	RCLCPP_INFO(ros_node_ptr_->get_logger(), "[LEFT MOTOR] Write GPIO-%02d", motor_left_pin_);
@@ -18,8 +19,23 @@ PWMWriter::PWMWriter()
        	if (motor_left_pi_ >= 0 && motor_right_pi_ >= 0) {
 	       	set_mode(motor_left_pi_, motor_left_pin_, PI_OUTPUT);
 		set_mode(motor_right_pi_, motor_right_pin_, PI_OUTPUT);
-	       	std::stringstream ros_gpio_topic;
-	       	ros_gpio_topic << "gpio_pwm_" << std::setw(2) << motor_left_pin_;
+		RCLCPP_INFO(ros_node_ptr_->get_logger(), "create subscription int16");
+		std::stringstream ss;
+     		ss << "gpio_pwm_" << std::setw(2) << motor_left_pin_;
+		ros_int16_subscription_ptr_ = ros_node_ptr_->create_subscription<std_msgs::msg::Int16>(
+				 "/int16",
+				 10,
+				 [this](const std_msgs::msg::Int16::SharedPtr call) {
+				 	int16_t pwm_dutycycle = call->data;
+
+ 				        set_PWM_dutycycle(motor_left_pi_, motor_left_pin_, pwm_dutycycle);
+				        RCLCPP_INFO(ros_node_ptr_->get_logger(), "[LEFT MOTOR] Write  %03d on GPIO-%d", pwm_dutycycle, motor_left_pin_);
+
+				        set_PWM_dutycycle(motor_right_pi_, motor_right_pin_, pwm_dutycycle);
+				        RCLCPP_INFO(ros_node_ptr_->get_logger(), "[RIGHT MOTOR] Write  %03d on GPIO-%d", pwm_dutycycle, motor_right_pin_);
+
+				 }
+		 );
 		ros_cmd_vel_subscription_ptr_ = ros_node_ptr_->create_subscription<geometry_msgs::msg::Twist>(
 				ROS_CMD_VEL_SUBSCRIPTION_TOPIC,
 				rclcpp::QoS(rclcpp::KeepLast(ROS_DEFAULT_QOS)),
@@ -41,12 +57,13 @@ PWMWriter::~PWMWriter() {
 }
 
 void PWMWriter::ros_cmd_vel_subscription_callback(const geometry_msgs::msg::Twist::SharedPtr cmd_vel_callback_msg_ptr) const {
-	int16_t pwm_dutycycle = 100;
+	int16_t pwm_dutycycle = 250;
+	int16_t accel = (int)(pwm_dutycycle * cmd_vel_callback_msg_ptr->linear.x);
 
-	set_PWM_dutycycle(motor_left_pi_, motor_left_pin_, pwm_dutycycle);
+	set_PWM_dutycycle(motor_left_pi_, motor_left_pin_, accel);
         RCLCPP_INFO(ros_node_ptr_->get_logger(), "[LEFT MOTOR] Write  %03d on GPIO-%d", pwm_dutycycle, motor_left_pin_);
         
-        set_PWM_dutycycle(motor_right_pi_, motor_right_pin_, pwm_dutycycle);
+        set_PWM_dutycycle(motor_right_pi_, motor_right_pin_, accel);
 	RCLCPP_INFO(ros_node_ptr_->get_logger(), "[RIGHT MOTOR] Write  %03d on GPIO-%d", pwm_dutycycle, motor_right_pin_);
 }
 

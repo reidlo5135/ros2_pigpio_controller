@@ -26,6 +26,7 @@ class PWMWriter : public rclcpp::Node {
 	  int motor_right_pi_;
 	  int motor_right_pin_;
 	  std::shared_ptr<rclcpp::Node> ros_node_ptr_;
+	  rclcpp::Subscription<std_msgs::msg::Int16>::SharedPtr ros_int16_subscription_ptr_;
 	  rclcpp::Subscription<geometry_msgs::msg::Twist>::SharedPtr ros_cmd_vel_subscription_ptr_;
 	  void ros_cmd_vel_subscription_callback(const geometry_msgs::msg::Twist::SharedPtr cmd_vel_callback_msg_ptr) const;
 	public:
