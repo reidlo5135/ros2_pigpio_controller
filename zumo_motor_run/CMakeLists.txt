@@ -23,12 +23,12 @@ find_package(rclcpp REQUIRED)
 find_package(std_msgs REQUIRED)
 find_package(geometry_msgs REQUIRED)
 
-add_executable(gpio_pwm_writer src/gpio_pwm_writer.cpp)
-target_link_libraries(gpio_pwm_writer pigpiod_if2)
-ament_target_dependencies(gpio_pwm_writer rclcpp std_msgs)
+add_executable(gpio_pwm_cmd_vel_controller src/gpio_pwm_cmd_vel_controller.cpp)
+target_link_libraries(gpio_pwm_cmd_vel_controller pigpiod_if2)
+ament_target_dependencies(gpio_pwm_cmd_vel_controller rclcpp std_msgs)
 
 install(TARGETS
-  gpio_pwm_writer
+  gpio_pwm_cmd_vel_controller
   DESTINATION lib/${PROJECT_NAME}
 )
 
