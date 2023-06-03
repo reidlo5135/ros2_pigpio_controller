@@ -23,7 +23,7 @@ PWMWriter::PWMWriter()
 		ros_cmd_vel_subscription_ptr_ = ros_node_ptr_->create_subscription<geometry_msgs::msg::Twist>(
 				ROS_CMD_VEL_SUBSCRIPTION_TOPIC,
 				rclcpp::QoS(rclcpp::KeepLast(ROS_DEFAULT_QOS)),
-				std::bind(&PWMWriter::ros_cmd_vel_subscription_callback, this, _1);
+				std::bind(&PWMWriter::ros_cmd_vel_subscription_callback, this, _1)
 		);
        	} else {
 		RCLCPP_ERROR(ros_node_ptr_->get_logger(), "cannot connect pigpiod");
