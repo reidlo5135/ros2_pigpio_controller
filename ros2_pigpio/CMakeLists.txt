@@ -14,7 +14,9 @@ if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
 endif()
 
 find_package(ament_cmake REQUIRED)
+find_package(rclc REQUIRED)
 find_package(rclcpp REQUIRED)
+find_package(rclc_lifecycle REQUIRED)
 find_package(std_msgs REQUIRED)
 find_package(geometry_msgs REQUIRED)
 
@@ -23,29 +25,96 @@ include_directories(
 	include/${PROJECT_NAME}	
 )
 
-add_executable(gpio_reader src/gpio_reader.cpp)
-target_link_libraries(gpio_reader pigpiod_if2)
-ament_target_dependencies(gpio_reader rclcpp std_msgs)
+add_executable(
+  servo_controller
+  src/servo_controller/servo_controller.c
+)
 
-add_executable(gpio_writer src/gpio_writer.cpp)
-target_link_libraries(gpio_writer pigpiod_if2)
-ament_target_dependencies(gpio_writer rclcpp std_msgs)
+target_link_libraries(
+  servo_controller
+  pigpiod_if2
+  m
+)
 
-add_executable(gpio_pwm_writer src/gpio_pwm_writer.cpp)
-target_link_libraries(gpio_pwm_writer pigpiod_if2)
-ament_target_dependencies(gpio_pwm_writer rclcpp std_msgs)
+ament_target_dependencies(
+  servo_controller
+  rclc
+  std_msgs
+  geometry_msgs
+)
 
-add_executable(wheels src/wheels.cpp)
-target_link_libraries(wheels pigpiod_if2)
-ament_target_dependencies(wheels rclcpp std_msgs geometry_msgs)
+add_executable(
+  gpio_reader
+  src/gpio_reader.cpp
+)
+
+target_link_libraries(
+  gpio_reader
+  pigpiod_if2
+)
+
+ament_target_dependencies(
+  gpio_reader
+  rclcpp
+  std_msgs
+)
+
+add_executable(
+  gpio_writer
+  src/gpio_writer.cpp
+)
+
+target_link_libraries(
+  gpio_writer
+  pigpiod_if2
+)
+
+ament_target_dependencies(
+  gpio_writer
+  rclcpp
+  std_msgs
+)
+
+add_executable(
+  gpio_pwm_writer
+  src/gpio_pwm_writer.cpp
+)
+
+target_link_libraries(
+  gpio_pwm_writer
+  pigpiod_if2
+)
+
+ament_target_dependencies(
+  gpio_pwm_writer
+  rclcpp
+  std_msgs
+)
+
+add_executable(
+  wheels
+  src/wheels.cpp
+)
+
+target_link_libraries(
+  wheels
+  pigpiod_if2
+)
+
+ament_target_dependencies(
+  wheels
+  rclcpp
+  std_msgs
+  geometry_msgs
+)
 
 install(TARGETS
+  servo_controller
   gpio_reader
   gpio_writer
   gpio_pwm_writer
   wheels
   DESTINATION lib/${PROJECT_NAME}
 )
-
 
 ament_package()
