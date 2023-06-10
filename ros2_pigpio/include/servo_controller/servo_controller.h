@@ -13,14 +13,14 @@
 #define RCL_CMD_VEL_SUBSCRIPTION_TOPIC "/cmd_vel"
 
 // motor left
-extern int pin_in1a;
-extern int pin_in1b;
-extern int pin_pwm1;
+int pin_in1a = 18;
+int pin_in1b = 5;
+int pin_pwm1 = -1;
 
 // motor right
-extern int pin_in2a;
-extern int pin_in2b;
-extern int pin_pwm2;
+int pin_in2a = 12;
+int pin_in2b = 6;
+int pin_pwm2 = -1;
 
 void sig_handler(int sig);
 void rcl_cmd_vel_callback(const void * rclc_cmd_vel_in);
