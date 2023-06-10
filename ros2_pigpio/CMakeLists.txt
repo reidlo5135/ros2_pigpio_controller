@@ -16,7 +16,6 @@ endif()
 find_package(ament_cmake REQUIRED)
 find_package(rclc REQUIRED)
 find_package(rclcpp REQUIRED)
-find_package(rclc_lifecycle REQUIRED)
 find_package(std_msgs REQUIRED)
 find_package(geometry_msgs REQUIRED)
 

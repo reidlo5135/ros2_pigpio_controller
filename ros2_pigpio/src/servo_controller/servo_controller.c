@@ -42,6 +42,34 @@ void set_pin_with_pwm(int pin_ain1, int pin_ain2, int pin_apwm, int pin_bin1, in
 }
 
 int main(int argc, const char * const * argv) {
+    pi_ = pigpio_start(NULL, NULL);
+
+    if (pi_ >= 0) {
+            if (pin_pwm1 >= 0) {
+                set_pin_with_pwm(
+                    pin_in1a, pin_in1b, pin_pwm1,
+                    pin_in2a, pin_in2b, pin_pwm2);
+                RCUTILS_LOG_INFO_NAMED(RCL_NODE_NAME,
+                            "Right Motor 1 : IN1A=%02d, IN1B=%02d, PWM1=%02d",
+                            pin_in1a, pin_in1b, pin_pwm1);
+                RCUTILS_LOG_INFO_NAMED(RCL_NODE_NAME,
+                            "Left Motor 2 : IN2A=%02d, IN2B=%02d, PWM2=%02d",
+                            pin_in2a, pin_in2b, pin_pwm2);
+            } else {
+                set_pin(pin_in1a, pin_in1b, pin_in2a, pin_in2b);
+                RCUTILS_LOG_INFO_NAMED(RCL_NODE_NAME,
+                            "Right Motor 1 : IN1A=%02d, IN1B=%02d",
+                            pin_in1a, pin_in1b, pin_pwm1);
+                RCUTILS_LOG_INFO_NAMED(RCL_NODE_NAME,
+                            "Left Motor 2 : IN2A=%02d, IN2B=%02d",
+                            pin_in2a, pin_in2b, pin_pwm2);
+            }
+    } else {
+	    RCUTILS_LOG_ERROR_NAMED(RCL_NODE_NAME, "cannot connect pigpiod");
+            exit(1);
+    }
+
+
     rcl_allocator_t rcl_allocator = rcl_get_default_allocator();
     rclc_support_t rclc_support;
     rcl_ret_t rc;
@@ -73,6 +101,13 @@ int main(int argc, const char * const * argv) {
     rcl_subscription_t rcl_cmd_vel_subscription = rcl_get_zero_initialized_subscription();
     const char * rcl_cmd_vel_topic = RCL_CMD_VEL_SUBSCRIPTION_TOPIC;
     const rosidl_message_type_support_t * rcl_twist_message_type = ROSIDL_GET_MSG_TYPE_SUPPORT(geometry_msgs, msg, Twist);
+
+    rc = rclc_subscription_init_default(
+		    &rcl_cmd_vel_subscription,
+		    &rcl_node,
+		    rcl_twist_message_type,
+		    rcl_cmd_vel_topic
+	 );
 
     if (rc != RCL_RET_OK) {
 		RCUTILS_LOG_ERROR_NAMED(RCL_NODE_NAME, "Failed to create %s subscription, error code RC [%i]\n", rcl_cmd_vel_topic, rc);
@@ -115,15 +150,16 @@ int main(int argc, const char * const * argv) {
 		RCUTILS_LOG_INFO_NAMED(RCL_NODE_NAME, "Succeeded to spin rclc executor, success code RC [%i]\n", rc);
     }
 
+    pigpio_stop(pi_);
     rc = rclc_executor_fini(&rclc_executor);
     rc += rcl_subscription_fini(&rcl_cmd_vel_subscription, &rcl_node);
     geometry_msgs__msg__Twist__fini(&rcl_twist_msgs);
 
     if (rc != RCL_RET_OK) {
-        RCUTILS_LOG_ERROR_NAMED(RCL_NODE_NAME, "Error while cleaning up!\n");
+        RCUTILS_LOG_ERROR_NAMED(RCL_NODE_NAME, "Failed to fini rcl, error code RC [%i]\n", rc);
         return EXIT_FAILURE;
     } else {
-		RCUTILS_LOG_INFO_NAMED(RCL_NODE_NAME, "Succeeded to cleaning up rcl\n");
+		RCUTILS_LOG_INFO_NAMED(RCL_NODE_NAME, "Succeeded to fini rcl, success code RC [%i]\n", rc);
 	}
 
     return rc;
