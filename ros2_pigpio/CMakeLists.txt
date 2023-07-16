@@ -25,24 +25,6 @@ include_directories(
 )
 
 add_executable(
-  servo_controller
-  src/servo_controller/servo_controller.c
-)
-
-target_link_libraries(
-  servo_controller
-  pigpiod_if2
-  m
-)
-
-ament_target_dependencies(
-  servo_controller
-  rclc
-  std_msgs
-  geometry_msgs
-)
-
-add_executable(
   gpio_reader
   src/gpio_reader.cpp
 )
@@ -108,7 +90,6 @@ ament_target_dependencies(
 )
 
 install(TARGETS
-  servo_controller
   gpio_reader
   gpio_writer
   gpio_pwm_writer
